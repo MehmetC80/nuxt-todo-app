@@ -1,42 +1,12 @@
 <script setup lang="ts">
-interface Todo {
-  id: string;
-  item: string;
-  completed?: boolean;
-}
+import { useTodos } from "~/composables/useTodos";
 
-const { data: todos, refresh } = useAsyncData<{ data: Todo }>(
-  "todo",
-  async () => {
-    return $fetch("/api/todos");
-  }
-);
+const { todos, updatedTodo, deleteTodo, addTodo } = useTodos();
 const input = ref("");
-const addTodo = async () => {
-  if (!input) return;
 
-  await $fetch("/api/todos", {
-    method: "POST",
-    body: { item: input.value },
-  });
-
+const handleClick = () => {
+  addTodo(input.value);
   input.value = "";
-  refresh();
-};
-
-const updatedTodo = async (id: string) => {
-  await $fetch(`/api/todos/${id}`, {
-    method: "PUT",
-  });
-
-  refresh();
-};
-
-const deleteTodo = async (id: string) => {
-  await $fetch(`/api/todos/${id}`, {
-    method: "DELETE",
-  });
-  refresh();
 };
 </script>
 
@@ -49,14 +19,14 @@ const deleteTodo = async (id: string) => {
       <h1 class="text-2xl">Meine Todos</h1>
       <div class="w-full flex justify-between">
         <input
-          @keyup.enter="addTodo"
+          @keyup.enter="handleClick"
           v-model="input"
           type="text"
           placeholder="Meine Todo..."
           class="px-4 py-2 border rounded-md bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-600 mr-3"
         />
         <button
-          @click="addTodo"
+          @click="handleClick"
           class="rounded-full py-2 px-4 bg-blue-600 text-white text-xl hover:bg-blue-600/80 duration-150 transition"
         >
           +
